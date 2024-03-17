@@ -7,7 +7,7 @@ const getToken = () => localStorage.getItem("token");
 export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:3000/api", // Thay thế bằng URL của API backend của bạn
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
     prepareHeaders: (headers) => {
       const token = getToken();
       if (token) {
