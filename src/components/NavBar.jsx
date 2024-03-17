@@ -42,7 +42,7 @@ function Navbar() {
                 Products
               </Link>
             </li>
-            {isLoggedIn && role === "admin" && (
+            {isLoggedIn && (
               <li className="nav-item">
                 <Link className="nav-link" to="/add-product">
                   Add Product
