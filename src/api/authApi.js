@@ -8,13 +8,7 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers) => {
-      const token = getToken();
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
+    credentials: "include", // Quan trọng để gửi cookies
   }),
   endpoints: (builder) => ({
     loginUser: builder.mutation({
@@ -24,18 +18,6 @@ export const authApi = createApi({
         body: credentials,
       }),
       // Giả sử phản hồi trả về một object chứa token
-      async onQueryStarted(arg, { queryFulfilled }) {
-        try {
-          const { data } = await queryFulfilled;
-          if (data.token) {
-            localStorage.setItem("token", data.token); // Lưu token vào localStorage
-            localStorage.setItem("userId", data.userId); // Lưu userId vào localStorage
-            localStorage.setItem("role", data.role); // Lưu role vào localStorage
-          }
-        } catch (error) {
-          // Xử lý lỗi nếu có
-        }
-      },
     }),
     registerUser: builder.mutation({
       query: (user) => ({
@@ -44,8 +26,22 @@ export const authApi = createApi({
         body: user,
       }),
     }),
+    logoutUser: builder.mutation({
+      query: () => ({
+        url: "logout",
+        method: "POST",
+      }),
+    }),
+    checkSession: builder.query({
+      query: () => "check-session",
+    }),
     // Đăng xuất không cần gọi API, xử lý trực tiếp trong component
   }),
 });
 
-export const { useLoginUserMutation, useRegisterUserMutation } = authApi;
+export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
+  useLogoutUserMutation,
+  useCheckSessionQuery,
+} = authApi;

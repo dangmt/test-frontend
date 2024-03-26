@@ -1,17 +1,25 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLogoutUserMutation } from "../api/authApi";
+import { clearUser } from "../slice/userSlice"; // Đảm bảo bạn đã import action này
+import { useSelector, useDispatch } from "react-redux";
 
 function Navbar() {
   const navigate = useNavigate();
-
-  const logout = () => {
-    localStorage.removeItem("token"); // Xóa token từ localStorage
-    navigate("/login"); // Điều hướng người dùng về trang đăng nhập
+  const [logoutUser] = useLogoutUserMutation();
+  const { isLoggedIn, role } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+  const logout = async () => {
+    try {
+      await logoutUser().unwrap();
+      dispatch(clearUser()); // Cập nhật trạng thái người dùng trong Redux store
+      navigate("/login"); // Điều hướng người dùng về trang đăng nhập
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
   };
 
   // Kiểm tra xem có token trong localStorage hay không để xác định trạng thái đăng nhập
-  const isLoggedIn = !!localStorage.getItem("token");
-  const role = localStorage.getItem("role");
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">

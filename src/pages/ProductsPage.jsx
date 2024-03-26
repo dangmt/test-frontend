@@ -4,19 +4,20 @@ import {
   useGetProductsQuery,
   useDeleteProductMutation,
 } from "../api/productsApi";
+import { useSelector } from "react-redux";
 
 function ProductsPage() {
   const { data: products, error, isLoading } = useGetProductsQuery();
   const [deleteProduct] = useDeleteProductMutation();
+  const { isLoggedIn, role, userId } = useSelector((state) => state.user);
 
   // Giả sử `userId` và `role` được lưu trữ trong localStorage
-  const userId = localStorage.getItem("userId");
-  const role = localStorage.getItem("role");
-  const isAuthenticated = () => {
-    return !!localStorage.getItem("token");
-  };
 
   const canDeleteProduct = (productOwnerId) => {
+    // So sánh với userId và kiểm tra role
+    return role === "admin" || userId === productOwnerId;
+  };
+  const canUpdateProduct = (productOwnerId) => {
     // So sánh với userId và kiểm tra role
     return role === "admin" || userId === productOwnerId;
   };
@@ -50,7 +51,7 @@ function ProductsPage() {
                 >
                   View Details
                 </Link>
-                {isAuthenticated() &&
+                {isLoggedIn &&
                   canDeleteProduct(product.createdBy.toString()) && (
                     <button
                       className="btn btn-danger me-2"
@@ -59,9 +60,8 @@ function ProductsPage() {
                       Delete
                     </button>
                   )}
-                {isAuthenticated() &&
-                  (role === "admin" ||
-                    userId === product.createdBy.toString()) && (
+                {isLoggedIn &&
+                  canUpdateProduct(product.createdBy.toString()) && (
                     <Link
                       to={`/products/${product._id}/update`}
                       className="btn btn-warning"

@@ -6,13 +6,7 @@ export const productApi = createApi({
   reducerPath: "productApi",
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers) => {
-      const token = getToken();
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
+    credentials: "include",
   }),
   tagTypes: ["Product"],
   endpoints: (builder) => ({

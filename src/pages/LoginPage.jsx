@@ -1,24 +1,33 @@
-// src/pages/LoginPage.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLoginUserMutation } from "../api/authApi";
+import { useDispatch } from "react-redux";
+import { setUser } from "../slice/userSlice";
 
 function LoginPage() {
   const [loginUser, { isLoading, error }] = useLoginUserMutation();
   const navigate = useNavigate();
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
+  const [username, setUsername] = useState(""); // Thay đổi từ email sang username
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "username") setUsername(value); // Cập nhật cho username
+    if (name === "password") setPassword(value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const user = await loginUser(credentials).unwrap();
+      const user = await loginUser({
+        username,
+        password,
+        rememberMe,
+      }).unwrap(); // Giả sử API trả về một đối tượng user
+      dispatch(setUser(user)); // Dispatch action setUser với thông tin người dùng nhận được
+
       alert("Login successful");
       navigate("/"); // Điều hướng người dùng đến trang chủ sau khi đăng nhập thành công
     } catch (err) {
@@ -41,6 +50,7 @@ function LoginPage() {
             className="form-control"
             id="username"
             name="username"
+            value={username}
             required
             onChange={handleChange}
           />
@@ -54,9 +64,23 @@ function LoginPage() {
             className="form-control"
             id="password"
             name="password"
+            value={password}
             required
             onChange={handleChange}
           />
+        </div>
+        <div className="mb-3 form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="rememberMe"
+            name="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          <label className="form-check-label" htmlFor="rememberMe">
+            Remember me
+          </label>
         </div>
         <button type="submit" className="btn btn-primary" disabled={isLoading}>
           Login

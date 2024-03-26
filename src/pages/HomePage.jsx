@@ -1,9 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function HomePage() {
   // Kiểm tra xem người dùng đã đăng nhập chưa thông qua việc kiểm tra token trong localStorage
-  const isLoggedIn = !!localStorage.getItem("token");
+  const { isLoggedIn } = useSelector((state) => state.user);
 
   return (
     <div className="container mt-4">
