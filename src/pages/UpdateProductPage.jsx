@@ -4,12 +4,15 @@ import {
   useGetProductByIdQuery,
   useUpdateProductMutation,
 } from "../api/productsApi";
+import { useSelector } from "react-redux";
 
 function UpdateProductPage() {
   const { productId } = useParams();
   const navigate = useNavigate(); // Sử dụng useNavigate thay cho useHistory
   const { data: product, error, isLoading } = useGetProductByIdQuery(productId);
   const [updateProduct, { error: updateError }] = useUpdateProductMutation();
+  const { userId, role } = useSelector((state) => state.user); // Giả sử state.auth chứa thông tin người dùng
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -23,8 +26,11 @@ function UpdateProductPage() {
         description: product.description,
         price: product.price,
       });
+      if (product.createdBy.toString() !== userId && role !== "admin") {
+        navigate("/unauthorized"); // Chuyển hướng nếu người dùng không phải chủ sở hữu hoặc admin
+      }
     }
-  }, [product]);
+  }, [product, userId, role, navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

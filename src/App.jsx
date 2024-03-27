@@ -12,8 +12,11 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useCheckSessionQuery } from "./api/authApi";
 import { setUser, clearUser } from "./slice/userSlice";
+import Unauthorized from "./components/Unauthorized"; // Đảm bảo đã import đúng
+import PrivateRoute from "./components/PrivateRoute"; // Đường dẫn có thể khác tuỳ vào cấu trúc thư mục của bạn
+
 function App() {
-  const { data: sessionData, error, isUninitialized } = useCheckSessionQuery();
+  const { data: sessionData, error, isLoading } = useCheckSessionQuery();
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -27,9 +30,8 @@ function App() {
     }
     // Hook này chỉ chạy một lần sau khi component mount hoặc khi sessionData hoặc error thay đổi
   }, [sessionData, error, dispatch]);
-
   // Nếu query chưa được khởi tạo, bạn có thể muốn hiển thị loading spinner hoặc return null
-  if (isUninitialized) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
   return (
@@ -40,11 +42,16 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/products/:productId" element={<ProductDetailPage />} />
-          <Route
-            path="/products/:productId/update"
-            element={<UpdateProductPage />}
-          />
-          <Route path="/add-product" element={<AddProductPage />} />
+
+          <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route element={<PrivateRoute allowedRoles={["admin", "user"]} />}>
+            <Route path="/add-product" element={<AddProductPage />} />
+            <Route
+              path="/products/:productId/update"
+              element={<UpdateProductPage />}
+            />
+            {/* Đặt thêm các route cần bảo vệ bên trong đây */}
+          </Route>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/about" element={<AboutPage />} />
