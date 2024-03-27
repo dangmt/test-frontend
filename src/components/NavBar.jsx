@@ -11,7 +11,8 @@ function Navbar() {
   const dispatch = useDispatch();
   const logout = async () => {
     try {
-      await logoutUser().unwrap();
+      const response = await logoutUser().unwrap();
+      console.log(response);
       dispatch(clearUser()); // Cập nhật trạng thái người dùng trong Redux store
       navigate("/login"); // Điều hướng người dùng về trang đăng nhập
     } catch (error) {
